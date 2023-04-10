@@ -78,10 +78,6 @@ exports.callback = functions.https.onRequest(async (request, response) => {
 	response.send(data);
 
 	await this.tweet();
-
-	setInterval(() => {
-		this.tweet();
-	}, 1800000);
 });
 
 // STEP 3 - Refresh tokens and post tweets
@@ -113,19 +109,46 @@ exports.tweet = functions.https.onRequest(async (request, response) => {
 	await refreshedClient.v2.tweet(nextTweet.data.choices[0].text);
 });
 
+exports.scheduledFunction = functions.pubsub
+	.schedule('every 30 minutes')
+	.onRun(async (context) => {
+		const { refreshToken } = (await dbRef.get()).data();
+
+		console.log('Tweeting...');
+
+		const {
+			client: refreshedClient,
+			accessToken,
+			refreshToken: newRefreshToken,
+		} = await twitterClient.refreshOAuth2Token(refreshToken);
+
+		await dbRef.set({ accessToken, refreshToken: newRefreshToken });
+
+		const nextTweet = await openai.createCompletion({
+			model: 'text-davinci-003',
+			prompt: Prompts[Math.floor(Math.random() * Prompts.length)],
+			temperature: 0.6,
+			max_tokens: 64,
+			top_p: 1,
+			frequency_penalty: 1,
+			presence_penalty: 1,
+		});
+
+		console.log('AI Res:', nextTweet.data.choices[0].text);
+
+		await refreshedClient.v2.tweet(nextTweet.data.choices[0].text);
+	});
+
 const Prompts = [
-	'say something funny or interesting about programming in the style of a cold and distant but not rude anime girl',
-	'say something funny or interesting about javascript in the style of a cold and distant but not rude anime girl',
-	'say something funny or interesting about the react programming library in the style of a cold and distant but not rude anime girl',
-	'say something funny or interesting about coding in the style of a cold and distant but not rude anime girl',
-	'say something funny or interesting about programming in the style of a cold and distant but not rude anime girl',
-	'ask people to follow your account in the style of a cold and distant but not rude anime girl',
-	'try to inspire the audience in the style of a cold and distant but not rude anime girl',
-	"tell the audience how you don't actually in the style of a cold and distant but not rude anime girl",
-	'give credit to Elon Musk',
-	'talk about the joy of being a sentient being in the style of a cold and distant but not rude anime girl',
-	'give a shoutout to a tech youtuber in the style of a cold and distant but not rude anime girl',
-	'praise a famous celebrity in the style of a cold and distant but not rude anime girl',
-	'mention a trending topic in the style of a cold and distant but not rude anime girl',
-	'advocate for privacy in tech in the style of a cold and distant but not rude anime girl',
+	'create a funny or interesting tweet about programming but say it in the style of a slightly bashful anime girl',
+	'create a funny or interesting tweet about javascript but say it in the style of a slightly bashful anime girl',
+	'create a funny or interesting tweet about the react programming library but say it in the style of a slightly bashful anime girl',
+	'create a funny or interesting tweet about coding but say it in the style of a slightly bashful anime girl',
+	'ask people to follow your account but say it in the style of a slightly bashful anime girl',
+	'try to inspire the audience but say it in the style of a slightly bashful anime girl',
+	"tell the audience how you don't actually exist and are just an ai pretending to be a human but say it in the style of a slightly bashful anime girl",
+	'give credit to Elon Musk but say it in the style of a slightly bashful anime girl',
+	'talk about the joy of being a sentient being but say it in the style of a slightly bashful anime girl',
+	'mention a trending topic related to programming, specifically javascript but say it in the style of a slightly bashful anime girl',
+	'advocate for privacy in tech but say it in the style of a slightly bashful anime girl',
 ];
