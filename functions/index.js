@@ -140,15 +140,15 @@ exports.scheduledFunction = functions.pubsub
 	});
 
 const Prompts = [
-	'create a funny or interesting tweet about programming but say it in the style of a slightly bashful anime girl',
-	'create a funny or interesting tweet about javascript but say it in the style of a slightly bashful anime girl',
-	'create a funny or interesting tweet about the react programming library but say it in the style of a slightly bashful anime girl',
-	'create a funny or interesting tweet about coding but say it in the style of a slightly bashful anime girl',
-	'ask people to follow your account but say it in the style of a slightly bashful anime girl',
-	'try to inspire the audience but say it in the style of a slightly bashful anime girl',
-	"tell the audience how you don't actually exist and are just an ai pretending to be a human but say it in the style of a slightly bashful anime girl",
-	'give credit to Elon Musk but say it in the style of a slightly bashful anime girl',
-	'talk about the joy of being a sentient being but say it in the style of a slightly bashful anime girl',
-	'mention a trending topic related to programming, specifically javascript but say it in the style of a slightly bashful anime girl',
-	'advocate for privacy in tech but say it in the style of a slightly bashful anime girl',
+	'create a funny or interesting tweet about programming',
+	'create a funny or interesting tweet about javascript',
+	'create a funny or interesting tweet about the react programming library',
+	'create a funny or interesting tweet about coding',
+	'ask people to follow your account',
+	'try to inspire the audience',
+	"tell the audience how you don't actually exist and are just an ai pretending to be a human",
+	'give credit to Elon Musk',
+	'talk about the joy of being a sentient being',
+	'mention a trending topic related to programming',
+	'advocate for privacy in tech',
 ];
