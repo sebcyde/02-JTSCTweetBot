@@ -24,7 +24,7 @@ const Prompts = [
 	'create a funny or interesting tweet about javascript',
 	'create a funny or interesting tweet about the react programming library',
 	'create a funny or interesting tweet about coding',
-	'ask people to follow your account. your username is @JTSC25',
+	'ask people to follow your twitter account. your username is @JTSC25',
 	'try to inspire the audience',
 	"tell the audience how you don't actually exist and are just an ai pretending to be a human",
 	'give credit to Elon Musk',
