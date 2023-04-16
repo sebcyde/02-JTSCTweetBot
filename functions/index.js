@@ -1,7 +1,17 @@
 const { TwitterApi } = require('twitter-api-v2');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const axios = require('axios');
 admin.initializeApp();
+
+// For Programmatic Retweets
+//const Twit = require('twit');
+// const T = new Twit({
+// 	consumer_key: '<your_consumer_key>',
+// 	consumer_secret: '<your_consumer_secret>',
+// 	access_token: '<your_access_token>',
+// 	access_token_secret: '<your_access_token_secret>',
+// });
 
 const dbRef = admin.firestore().doc('tokens/demo');
 const twitterClient = new TwitterApi({
@@ -135,8 +145,6 @@ exports.auth = functions.https.onRequest(async (request, response) => {
 		}
 	);
 
-	console.log(url);
-
 	// Store Verifier
 	await dbRef.set({ codeVerifier, state });
 
@@ -203,7 +211,7 @@ exports.tweet = functions.https.onRequest(async (request, response) => {
 });
 
 exports.scheduledFunction = functions.pubsub
-	.schedule('every 30 minutes')
+	.schedule('every 15 minutes')
 	.onRun(async (context) => {
 		const { refreshToken } = (await dbRef.get()).data();
 
@@ -217,9 +225,17 @@ exports.scheduledFunction = functions.pubsub
 
 		await dbRef.set({ accessToken, refreshToken: newRefreshToken });
 
+		// Randomly Generate Tweet Content
 		(async () => {
-			const randomNum = Math.floor(Math.random() * 7); // Generate random number between 0 and 6
-			if (randomNum === 6) {
+			const DiceRoll = Math.floor(Math.random() * 7);
+
+			// DiceRoll Key
+			// 6 = AI Generated Tweet
+			// 5 = Inspirational Quote
+			// 4 = Anime Quote
+			// 3,2,1 = Tweet from list
+
+			if (DiceRoll === 6) {
 				// Random tweet from GPT prompts array
 				const nextTweet = await openai.createCompletion({
 					model: 'text-davinci-003',
@@ -234,8 +250,21 @@ exports.scheduledFunction = functions.pubsub
 				console.log('AI Res:', nextTweet.data.choices[0].text);
 
 				await refreshedClient.v2.tweet(nextTweet.data.choices[0].text);
+			} else if (DiceRoll === 5) {
+				const Response = await axios.get(
+					'https://api.goprogram.ai/inspiration'
+				);
+				await refreshedClient.v2.tweet(
+					`${Response.data.quote} - ${Response.data.author}`
+				);
+			} else if (DiceRoll === 4) {
+				const Response = await axios.get(
+					'https://animechan.vercel.app/api/random'
+				);
+				await refreshedClient.v2.tweet(
+					`${Response.data.quote} - ${Response.data.anime}, ${Response.data.character}`
+				);
 			} else {
-				// Random tweet from Tweets array
 				await refreshedClient.v2.tweet(
 					Tweets[Math.floor(Math.random() * Tweets.length)]
 				);
