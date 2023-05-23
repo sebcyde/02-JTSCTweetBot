@@ -2,21 +2,18 @@ const { TwitterApi } = require('twitter-api-v2');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios');
+require('dotenv').config();
 admin.initializeApp();
 
-// For Programmatic Retweets
-//const Twit = require('twit');
-// const T = new Twit({
-// 	consumer_key: '<your_consumer_key>',
-// 	consumer_secret: '<your_consumer_secret>',
-// 	access_token: '<your_access_token>',
-// 	access_token_secret: '<your_access_token_secret>',
-// });
+const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ID;
+const TWITTER_CLIENT_SECRET = process.env.CONSUMER_SECRET;
+const OPENAI_ORGANISATION = process.env.OPENAI_ORGANISATION;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const dbRef = admin.firestore().doc('tokens/demo');
 const twitterClient = new TwitterApi({
-	clientId: 'VUtodk0yU3ltMVRFd20ta2xSTzI6MTpjaQ',
-	clientSecret: 'cBjZtWu2M4FmWoRq6OX8t3xbRh-ck2PCTiZb7ELavVHl_u5h-j',
+	clientId: TWITTER_CLIENT_ID,
+	clientSecret: TWITTER_CLIENT_SECRET,
 });
 
 const callbackURL = 'http://127.0.0.1:5000/jtsctwitterbot/us-central1/callback';
@@ -24,8 +21,8 @@ const callbackURL = 'http://127.0.0.1:5000/jtsctwitterbot/us-central1/callback';
 // OpenAI API init
 const { Configuration, OpenAIApi } = require('openai');
 const configuration = new Configuration({
-	organization: 'org-smba6A2HVHPVa25c34KBxsrR',
-	apiKey: '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',
+	organization: OPENAI_ORGANISATION,
+	apiKey: OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
